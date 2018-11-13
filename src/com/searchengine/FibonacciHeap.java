@@ -2,6 +2,7 @@ package com.searchengine;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+//Node structure
 class Node {
 	int degree = 0;
 	Node child = null;
@@ -15,8 +16,10 @@ class Node {
 
 public class FibonacciHeap {
 	Node max;
+	//Hash table for this fibonacci heap
 	Hashtable<String, Node> h1 = new Hashtable<String, Node>();
 
+	//Check if keyword has to be inserted or incremented
 	public void insertOrIncreaseKey(String keyWord, int n) {
 		if (!h1.containsKey(keyWord)) {
 			insertIntoHeap(keyWord, n);
@@ -81,6 +84,7 @@ public class FibonacciHeap {
 		}
 		// When the above conditions fail, remove the node and add it to top level list.
 		Node n1_parent = n1.parent;
+		//Cascading cut
 		do {
 			// Update the child pointer of the parent if it was pointing to this node
 			if (n1.parent.child == n1) {
@@ -111,7 +115,7 @@ public class FibonacciHeap {
 			}
 			n1 = n1_parent;
 			n1_parent = n1_parent.parent;
-		} // Cascading Cut
+		}
 		while (n1.childCut == 'T');
 		// update childCut value as this node lost a child
 		if (n1.parent != null) {
@@ -120,7 +124,7 @@ public class FibonacciHeap {
 	}
 
 	
-	// get top n most searched keywords
+	// get top most n searched keywords
 	public ArrayList<String> getTopNKeywords(int n) {
 		if (max == null) {
 			return null;
@@ -148,12 +152,13 @@ public class FibonacciHeap {
 				// PAIRWISE COMBINE the remaining nodes in the top level list using tempMax
 				pairWiseCombineTopLevelList(tempMax);
 			}
-
-		} // first for loop
+		} 
+		//Return an arraylist with most searched keywords
 		ArrayList<String> mostSearchedWords = new ArrayList<String>();
 		for (Node node : outArray) {
 			mostSearchedWords.add(node.keyword);
 		}
+		//Re-insert these n keywords into fibonacci heap
 		reinsertNodesIntoFibonacciHeap(outArray);
 		return mostSearchedWords;
 
@@ -164,19 +169,9 @@ public class FibonacciHeap {
 		}
 	}
 	
+	//PairWise combine
 	public void pairWiseCombineTopLevelList(Node tempMax) {
-		int maxdegree = 0;
-		Node listIterator1 = tempMax;
-		// Find max degree
-		int sizeOfList = 1;
-		while (listIterator1.rightNode != tempMax) {
-			if (listIterator1.degree > maxdegree) {
-				maxdegree = listIterator1.degree;
-			}
-			sizeOfList++;
-			listIterator1 = listIterator1.rightNode;
-		}
-		// Create a treeTable with maxDegree as size of it
+		// Create a treeTable
 		Node[] treeTable = new Node[100];
 		Node listIterator = tempMax;
 		// Traverse through the array to find trees which have same degree
@@ -203,12 +198,12 @@ public class FibonacciHeap {
 						n2 = temp;
 						combineTwoTreesWithSameDegree(n1, n2);
 					}
-				} // else found nodes with same degrees
+				}
 			}
-			
 		} while (listIterator != tempMax);
 		// Forming the new top level list using the treeTable and updating max pointer
 		max = null;
+		//Reset left and right node pointer for top level nodes
 		for(Node currentNode:treeTable) {
 			if(currentNode!=null) {
 			currentNode.leftNode=currentNode;
@@ -253,10 +248,10 @@ public class FibonacciHeap {
 		}
 	}
 
+	//Combine two trees with same degree
 	public void combineTwoTreesWithSameDegree(Node n1, Node n2) {
-		// n1 has bigger data make it as the parent of n2
+		// n1 has bigger data, so make it as the parent of n2
 			n2.parent = n1;
-			// Make n2 child of n1. Update sibling pointers to ifself.
 			// degree is 0
 			if (n1.child == null) {
 				n1.child = n2;
